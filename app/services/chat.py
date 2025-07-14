@@ -8,12 +8,12 @@ import time
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 
-chat_model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.4, streaming=True)
+chat_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.4, streaming=True)
 
 async def handle_chat(query: str):
     query_emb = await get_embedding(query)
     docs = await search_similar(query_emb)
-    context = "\n".join([doc[1] for doc in docs])  # doc = (id, content)
+    context = "\n".join([doc[1] for doc in docs])
 
     chat_id = str(uuid.uuid4())
     start = time.time()
