@@ -2,6 +2,7 @@ from sqlalchemy import insert, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.models.document import Document
+from app.services.embedding import get_embedding
 import numpy as np
 
 async def upsert_docs(docs: list[dict]):

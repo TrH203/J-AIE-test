@@ -11,7 +11,7 @@ async def log_audit(chat_id: str, question: str, response: str, retrieved_docs: 
             response=response,
             retrieved_docs=retrieved_docs,
             latency_ms=latency_ms,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(),
         )
         await session.execute(stmt)
         await session.commit()
