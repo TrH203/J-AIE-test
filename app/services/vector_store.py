@@ -4,7 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from app.models.document import Document
 from app.services.embedding import get_embedding
+from sqlalchemy import text
 import numpy as np
+import json
 
 async def upsert_docs(docs: list[dict]):
     async with get_session() as session:
@@ -44,10 +46,14 @@ async def list_docs():
 
 async def search_similar(query_emb: list[float], k: int = 3):
     async with get_session() as session:
+        query_embedding_str = json.dumps(query_emb)
         q = f"""
-        SELECT id, content FROM documents
-        ORDER BY embedding <-> :embedding
+        SELECT id, content, embedding <-> (:query_embedding_str)::vector AS distance FROM documents
+        ORDER BY distance
         LIMIT :k
         """
-        result = await session.execute(q, {"embedding": np.array(query_emb), "k": k})
+        result = await session.execute(
+            text(q),
+            {"query_embedding_str": query_embedding_str, "k": k}
+        )
         return result.fetchall()
