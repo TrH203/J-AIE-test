@@ -38,7 +38,7 @@ async def search_audit_by_id(chat_id: str):
 
 async def list_audit_logs(limit: int = Query(50, ge=10, le=100), skip: int = Query(0, ge=0)):
     async with get_session() as session:
-        stmt = await session.execute(select(AuditLog).order_by(AuditLog.timestamp.desc()).limit(limit=limit))
+        stmt = select(AuditLog).order_by(AuditLog.timestamp.desc()).limit(limit=limit)
         
         stmt = stmt.offset(skip).limit(limit)
         result = await session.execute(stmt)

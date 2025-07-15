@@ -7,6 +7,7 @@ from app.services.embedding import get_embedding
 from app.services.action_logs import log_action
 import time
 import json
+import uuid
 from loguru import logger
 
 async def upsert_docs(docs: list[dict]):
@@ -14,11 +15,11 @@ async def upsert_docs(docs: list[dict]):
         results = []
         try:
             for doc in docs:
+                doc["id"] = doc.get("id", str(uuid.uuid4()))
                 start = time.time()
-
-                if "id" not in doc or "text" not in doc:
-                    reason = "Missing 'id' or 'text'"
-                    results.append({"id": doc.get("id"), "action": "failed", "reason": reason})
+                
+                if "text" not in doc:
+                    results.append({"id": doc["id"], "action": "failed", "reason": "Missing 'text'"})
 
                     await log_action(
                         action_type="upsert",
