@@ -1,4 +1,5 @@
 from sqlalchemy import insert
+from fastapi import Query, HTTPException
 from app.models.audit import AuditLog
 from app.core.database import get_session
 from datetime import datetime
@@ -23,7 +24,7 @@ async def search_audit_by_id(chat_id: str):
         log = result.scalar_one_or_none()
 
         if not log:
-            return None
+            raise HTTPException(status_code=404, detail=f"Log with chat id '{chat_id}' not found")
 
         return {
             "chat_id": log.chat_id,
@@ -35,10 +36,14 @@ async def search_audit_by_id(chat_id: str):
             "feedback": log.feedback
         }
 
-async def list_audit_logs():
+async def list_audit_logs(limit: int = Query(50, ge=10, le=100), skip: int = Query(0, ge=0)):
     async with get_session() as session:
-        result = await session.execute(select(AuditLog))
-        logs = result.scalars().all()
+        stmt = await session.execute(select(AuditLog).order_by(AuditLog.timestamp.desc()).limit(limit=limit))
+        
+        stmt = stmt.offset(skip).limit(limit)
+        result = await session.execute(stmt)
+        audits = result.scalars().all()
+        
         return [
             {
                 "chat_id": log.chat_id,
@@ -49,5 +54,5 @@ async def list_audit_logs():
                 "timestamp": log.timestamp,
                 "feedback": log.feedback
             }
-            for log in logs
+            for log in audits
         ]

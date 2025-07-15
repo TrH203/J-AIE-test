@@ -1,7 +1,7 @@
 from app.services.embedding import get_embedding
 from app.services.vector_store import search_similar
 from app.services.audit import log_audit
-from app.services.action_logger import log_action
+from app.services.action_logs import log_action
 import uuid
 import time
 import os

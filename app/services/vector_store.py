@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core.database import get_session
 from app.models.document import Document
 from app.services.embedding import get_embedding
-from app.services.action_logger import log_action
+from app.services.action_logs import log_action
 import time
 import json
 from loguru import logger

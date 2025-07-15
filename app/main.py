@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import chat, knowledge, audit, logs
+from app.api import action_logs, chat, knowledge, audit
 from app.core.database import engine
 from app.models.document import Base as DocBase
 from app.models.audit import Base as AuditBase
@@ -17,7 +17,7 @@ app = FastAPI()
 app.include_router(knowledge.router, prefix="/knowledge")
 app.include_router(chat.router, prefix="/chat")
 app.include_router(audit.router, prefix="/audit")
-app.include_router(logs.router, prefix="/logs", tags=["Logs"])
+app.include_router(action_logs.router, prefix="/logs", tags=["Action Logs"])
 
 @app.on_event("startup")
 async def startup():
