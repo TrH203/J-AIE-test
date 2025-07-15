@@ -21,7 +21,7 @@ MAX_OUTPUT_TOKEN = int(os.getenv("MAX_OUTPUT_TOKEN"))
 TOP_K = int(os.getenv("TOP_K"))
 MIN_SIM_SCORE = float(os.getenv("MIN_SIM_SCORE"))
 
-chat_model = ChatGoogleGenerativeAI(model=LLM_MODEL_NAME,
+chat_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash",
                                     temperature=MODEL_TEMPERATURE,
                                     model_kwargs={
                                         "streaming": True,
@@ -90,6 +90,48 @@ workflow.add_edge("final_answer", END)
 
 graph = workflow.compile(checkpointer=MemorySaver())
 
+#---------Confident Score-----------
+
+CONFIDENCE_PROMPT_TEMPLATE = """
+    You are an impartial judge evaluating whether an AI-generated answer is factually supported by a given context.
+
+    Here is the context provided to the AI:
+    ---CONTEXT---
+    {context_str}
+    ---END CONTEXT---
+
+    Here is the user's question:
+    ---QUESTION---
+    {question}
+    ---END QUESTION---
+
+    Here is the AI's generated answer:
+    ---ANSWER---
+    {response}
+    ---END ANSWER---
+
+    Your task is to determine a confidence score from 0.0 to 1.0, where:
+    - 1.0 means the answer is fully and verifiably supported by the information in the CONTEXT.
+    - 0.0 means the answer is not at all supported by the information in the CONTEXT.
+
+    Please provide ONLY the numerical score and nothing else.
+    """
+
+async def calculate_confidence_score(context: str, question: str, response: str) -> float:
+    """Calculates the confidence score of an AI-generated answer based on context."""
+    prompt = CONFIDENCE_PROMPT_TEMPLATE.format(
+        context_str=context,
+        question=question,
+        response=response
+    )
+    try:
+        res = await chat_model.ainvoke([HumanMessage(content=prompt)])
+        score_str = res.content.strip()
+        return float(score_str)
+    except Exception as e:
+        logger.error(f"Error calculating confidence score: {e}")
+        return 0.0
+
 async def handle_chat(query: str, enable_reasoning: bool = True):
     start = time.time()
     chat_id = str(uuid.uuid4())
@@ -100,6 +142,7 @@ async def handle_chat(query: str, enable_reasoning: bool = True):
         first_token_latency = None
         docs = []
         final_state = None
+        confidence_score = 0.0
 
         # Execute the graph and collect the final state
         async for state in graph.astream(
@@ -133,14 +176,19 @@ async def handle_chat(query: str, enable_reasoning: bool = True):
             for char in answer_content:
                 yield char
                 output += char
+            # context_for_confidence = "\n".join([doc[i] for i,doc in enumerate(docs)])
+            confidence_score = await calculate_confidence_score(str(docs), query, output)
+            logger.info(confidence_score)
+            logger.info(docs)
 
-        # Log audit information
+
         await log_audit(
             chat_id=chat_id,
             question=query,
             response=output,
             retrieved_docs=docs,
-            latency_ms=first_token_latency
+            latency_ms=first_token_latency,
+            model_confident=confidence_score
         )
         
         total_latency = int((time.time() - start) * 1000)
@@ -155,10 +203,11 @@ async def handle_chat(query: str, enable_reasoning: bool = True):
             },
             response_data={
                 "answer": output,
-                "reasoning": reasoning_text
+                "reasoning": reasoning_text,
+                "model_confident": confidence_score
             },
             latency_ms=total_latency,
             status="success"
         )
-
+    
     return generator()

@@ -5,7 +5,7 @@ from app.core.database import get_session
 from datetime import datetime
 from sqlalchemy import select
 
-async def log_audit(chat_id: str, question: str, response: str, retrieved_docs: list[str], latency_ms: int):
+async def log_audit(chat_id: str, question: str, response: str, retrieved_docs: list[str], latency_ms: int, model_confident: float = None, mcp_metadata: str = None):
     async with get_session() as session:
         stmt = insert(AuditLog).values(
             chat_id=chat_id,
@@ -14,6 +14,7 @@ async def log_audit(chat_id: str, question: str, response: str, retrieved_docs: 
             retrieved_docs=retrieved_docs,
             latency_ms=latency_ms,
             timestamp=datetime.now(),
+            model_confident=model_confident,
         )
         await session.execute(stmt)
         await session.commit()
@@ -33,6 +34,7 @@ async def search_audit_by_id(chat_id: str):
             "retrieved_docs": log.retrieved_docs,
             "latency_ms": log.latency_ms,
             "timestamp": log.timestamp,
+            "model_confident": log.model_confident,
             "feedback": log.feedback
         }
 
@@ -52,6 +54,7 @@ async def list_audit_logs(limit: int = Query(50, ge=10, le=100), skip: int = Que
                 "retrieved_docs": log.retrieved_docs,
                 "latency_ms": log.latency_ms,
                 "timestamp": log.timestamp,
+                "model_confident": log.model_confident,
                 "feedback": log.feedback
             }
             for log in audits

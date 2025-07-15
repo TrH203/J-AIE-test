@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Integer, TIMESTAMP, ARRAY
+from sqlalchemy import Column, String, Text, Integer, TIMESTAMP, ARRAY, Float, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -13,4 +13,5 @@ class AuditLog(Base):
     retrieved_docs = Column(ARRAY(String), nullable=False)
     latency_ms = Column(Integer)
     timestamp = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    model_confident = Column(Float, nullable=True)
     feedback = Column(Text, nullable=True)
