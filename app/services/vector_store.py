@@ -55,10 +55,11 @@ async def upsert_docs(docs: list[dict]):
                     stmt = insert(Document).values(
                         id=doc["id"],
                         content=doc["text"],
-                        embedding=vec
+                        embedding=vec,
+                        extra_info=doc.get("extra_data", {}),
                     ).on_conflict_do_update(
                         index_elements=["id"],
-                        set_={"content": doc["text"], "embedding": vec}
+                        set_={"content": doc["text"], "embedding": vec, "extra_info": doc.get("extra_info", {})}
                     )
                     await session.execute(stmt)
 

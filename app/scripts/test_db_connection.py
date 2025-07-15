@@ -24,6 +24,8 @@ async def test_connection():
             SELECT table_name FROM information_schema.tables
             WHERE table_schema='public';
         """))
+        
+        await conn.execute(text("DROP TABLE documents;"))
         tables = result.scalars().all()
         print("Tables:", tables)
 

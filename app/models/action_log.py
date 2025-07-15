@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, JSON, DateTime, Integer
+from sqlalchemy import Column, String, Text, DateTime, Integer
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
