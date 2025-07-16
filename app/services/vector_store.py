@@ -56,7 +56,7 @@ async def upsert_docs(docs: list[dict]):
                         id=doc["id"],
                         content=doc["text"],
                         embedding=vec,
-                        extra_info=doc.get("extra_data", {}),
+                        extra_info=doc.get("extra_info", {}),
                     ).on_conflict_do_update(
                         index_elements=["id"],
                         set_={"content": doc["text"], "embedding": vec, "extra_info": doc.get("extra_info", {})}
@@ -199,6 +199,20 @@ async def list_docs():
 
             return {"status": "error", "message": str(e)}
 
+async def search_knowledge_by_id(knowledge_id: str):
+    async with get_session() as session:
+        result = await session.execute(select(Document).where(Document.id == knowledge_id))
+        log = result.scalar_one_or_none()
+
+        if not log:
+            return {}
+
+        return {
+            "id": log.id,
+            "content": log.content,
+            "created_at": log.created_at,
+            "extra_info": log.extra_info,
+        }
 
 async def search_similar(query_emb: list[float], k: int = 3, min_sim_score: float = 0.5):
     async with get_session() as session:

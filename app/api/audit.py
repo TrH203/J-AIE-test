@@ -16,6 +16,5 @@ async def get_all_audits(
         limit: int = Query(50, ge=10, le=100)):
     """
     Example: /audit?skip=0&limit=20
-    Optional filter by chat_id: /audit?chat_id=1234-uuid
     """
     return await list_audit_logs(limit=limit, skip=skip)

@@ -39,7 +39,8 @@ async def list_all_action_logs(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=500),
     action_type: str | None = None,
-    resource_type: str | None = None
+    resource_type: str | None = None,
+    status: str | None = None
 ):
     async with get_session() as session:
         stmt = select(ActionLog).order_by(ActionLog.timestamp.desc())
@@ -48,6 +49,8 @@ async def list_all_action_logs(
             stmt = stmt.where(ActionLog.action_type == action_type)
         if resource_type:
             stmt = stmt.where(ActionLog.resource_type == resource_type)
+        if status:
+            stmt = stmt.where(ActionLog.status == status)
 
         stmt = stmt.offset(skip).limit(limit)
         result = await session.execute(stmt)

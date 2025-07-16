@@ -23,7 +23,7 @@ async def extract_text_from_txt(file_path: str) -> List[str]:
     chunks = text_splitter.split_documents(documents)
     return [chunk.page_content for chunk in chunks]
 
-async def extract_text(file_path: str, file_ext: str):
+async def extract_text(file_path: str, file_ext: str, file_name:str):
     """Auto choose extraction method based on file type."""
     if file_ext == ".pdf":
         docs = await extract_text_from_pdf(file_path)
@@ -31,4 +31,4 @@ async def extract_text(file_path: str, file_ext: str):
         docs = await extract_text_from_txt(file_path)
     else:
         return []
-    return [{"text": doc, "extra_info": {"filename": file_path.split("/")[-1]}} for doc in docs]
+    return [{"text": doc, "extra_info": {"filename": file_name}} for doc in docs]
