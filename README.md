@@ -5,6 +5,59 @@ This repository houses the backend API for a FastAPI application, designed to ma
 
 ---
 
+## Project Requirements Checklist
+
+This project successfully addresses the following key requirements:
+
+  - [x] **FastAPI in backend:** The entire API is built using the FastAPI framework.
+  - [x] **Pgvector for SQL and vector DB:** PostgreSQL with the `pgvector` extension is utilized for both relational data and vector embeddings.
+  - [x] **LangChain for LLM process and embedding:** LangChain is integrated for managing LLM interactions and generating text embeddings.
+  - [x] **LangGraph for reasoning:** LangGraph is used to implement advanced reasoning capabilities within the LLM processes.
+  - [x] **Provided Dockerfile and `docker-compose.yml`:** The project includes complete Dockerization for easy setup and deployment.
+  - [x] **Simple running command:** Clear and straightforward commands are provided for both local and Docker-based execution.
+  - [x] **Finished all API Specifications requirement:** All API endpoints adhere to the defined OpenAPI specifications.
+
+-----
+
+## Codebase Architecture
+
+The project's folder structure is organized for modularity and maintainability:
+
+```
+.
+├── app/                      # Main application source code
+│   ├── api/                  # FastAPI routers defining API endpoints
+│   │   ├── action_logs.py    
+│   │   ├── audit.py          
+│   │   ├── chat.py           
+│   │   ├── knowledge.py     
+│   ├── core/                 # Core application configurations and utilities
+│   │   ├── config.py         
+│   │   └── database.py       
+│   ├── main.py               # Entry point of the FastAPI application, registers all routers
+│   ├── models/               # Pydantic models (schemas) and database ORM models
+│   │   ├── action_log.py     
+│   │   ├── audit.py         
+│   │   ├── document.py       
+│   │   └── type.py           # Common type definitions, including custom Enums
+│   ├── scripts/              
+│   │   └── test_db_connection.py
+│   └── services/             # Implement logic and external service integrations
+│       ├── action_logs.py    
+│       ├── audit.py          
+│       ├── chat.py           
+│       ├── embedding.py      
+│       ├── file_extractor/   # Module for extracting text content from various file types
+│       │   └── __init__.py   
+│       └── vector_store.py   
+├── docker-compose.yml        # Docker Compose configuration for multi-service deployment (app, db)
+├── Dockerfile                # Dockerfile for building the FastAPI application image
+├── README.md                 
+├── requirements.txt          
+└── test/                     
+    └── example_curl.sh       # Example `curl` commands for quick API testing
+```
+
 ## Table of Contents
 
 - [Features](#features)
@@ -115,19 +168,79 @@ You can test API access and explore the endpoints via the interactive documentat
 
 Here are some `curl` commands to quickly test the chat functionality:
 
-**Chat without reasoning (default behavior)**
-
+# Test api Access into [0.0.0.0:8000/docs](http://0.0.0.0:8000/docs)
+# Create knowledge
 ```bash
-curl -X POST http://0.0.0.0:8000/chat \
+curl -X POST http://0.0.0.0:8000/knowledge/update \
     -H "Content-Type: application/json" \
-    -d '{"text": "Tell me about AI"}'
+    -d '[{"text": "HTH is Hoang Trong Hien, he is an AI Engineer in Viet Name"}]'
 ```
-**Chat with reasoning**
 
+# Create
+```bash
+curl -X POST http://0.0.0.0:8000/knowledge/update \
+    -H "Content-Type: application/json" \
+    -d '[{"text": "HTH is Hieuthuhai, he is a rapper and singer in Viet Nam"}]'
+```
+
+# Create
+```bash
+curl -X POST http://0.0.0.0:8000/knowledge/update \
+    -H "Content-Type: application/json" \
+    -d '[{"text": "G-Dragon is a rapper and singer in Korea"}]'
+```
+
+# Create
+```bash
+curl -X POST http://0.0.0.0:8000/knowledge/update \
+    -H "Content-Type: application/json" \
+    -d '[{"id": "doc1", "text": "AI is Apple Inteligent"}]'
+```
+
+# Update
+```bash
+curl -X POST http://0.0.0.0:8000/knowledge/update \
+    -H "Content-Type: application/json" \
+    -d '[{"id": "doc1", "text": "AI is Artificial Inteligient"}]'
+```
+
+# Get all knowledge
+```bash
+curl -X GET http://0.0.0.0:8000/knowledge
+```
+
+# Get knowledge by id
+```bash
+curl -X GET http://0.0.0.0:8000/knowledge/doc1
+```
+
+# Delete knowledge by id
+```bash
+curl -X DELETE http://0.0.0.0:8000/knowledge/doc1
+```
+
+# Chat without reasoning
 ```bash
 curl -X POST http://0.0.0.0:8000/chat \
     -H "Content-Type: application/json" \
-    -d '{"text": "Tell me about AI", "enable_reasoning": true}'
+    -d '{"query": "What is the name of singer and rapper in Viet Nam"}'
+```
+
+# Chat without reasoning
+```bash
+curl -X POST http://0.0.0.0:8000/chat \
+    -H "Content-Type: application/json" \
+    -d '{"query": "What is the name of singer and rapper in Viet Nam", "enable_reasoning": true}'
+```
+
+# Get all action logs
+```bash
+curl -X GET http://localhost:8000/logs/
+```
+
+# Get all audit logs
+```bash
+curl -X GET http://localhost:8000/audit/
 ```
 
 ### Environment Variables (.env.deploy)
