@@ -118,14 +118,14 @@ Here are some `curl` commands to quickly test the chat functionality:
 **Chat without reasoning (default behavior)**
 
 ```bash
-curl -X POST http://localhost:8000/chat \
+curl -X POST http://0.0.0.0:8000/chat \
     -H "Content-Type: application/json" \
     -d '{"text": "Tell me about AI"}'
 ```
-**Chat with reasoning (default behavior)**
+**Chat with reasoning**
 
 ```bash
-curl -X POST http://localhost:8000/chat \
+curl -X POST http://0.0.0.0:8000/chat \
     -H "Content-Type: application/json" \
     -d '{"text": "Tell me about AI", "enable_reasoning": true}'
 ```
