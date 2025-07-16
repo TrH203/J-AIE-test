@@ -12,8 +12,8 @@ async def update_knowledge(docs: list[dict]):
     """
     Create or Update(if id existed)
     Example:
-    - {"id": "uuid1", "text": "abc"} # Create
-    - {"id": "uuid1", "text": "xyz"} # Update
+    - {"id": "uuid1", "text": "abc"} # For Create
+    - {"id": "uuid1", "text": "xyz"} # For Update
     """
     return await upsert_docs(docs)
 
@@ -30,6 +30,9 @@ async def get_knowledge():
 
 @router.get("/{knowledge_id}")
 async def get_knowledge_by_id(knowledge_id):
+    """
+    Get detail knowledge by id
+    """
     return await search_knowledge_by_id(knowledge_id=knowledge_id)
 
 @router.post("/upload")

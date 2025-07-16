@@ -1,11 +1,11 @@
-curl -X POST http://localhost:8000/knowledge/update \
-    -H "Content-Type: application/json" \
-    -d '[{"id": "doc1", "text": "AI is cool"}]'
+# Test api Access into 0.0.0.0:8000/docs
 
-curl http://localhost:8000/knowledge
-
+# Chat without reasoning
 curl -X POST http://localhost:8000/chat \
     -H "Content-Type: application/json" \
     -d '{"query": "Tell me about AI"}'
 
-curl http://localhost:8000/audit/some_chat_id
+# Chat without reasoning
+curl -X POST http://localhost:8000/chat \
+    -H "Content-Type: application/json" \
+    -d '{"query": "Tell me about AI", "enable_reasoning": true}'

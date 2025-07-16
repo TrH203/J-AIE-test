@@ -12,6 +12,6 @@ async def chat_stream(request: Request):
     {"text": "Tell me about AI", enable_reasoning: true(default=false)}
     """
     data = await request.json()
-    generator = await handle_chat(data["query"], enable_reasoning=data.get("enable_reasoning", True))
+    generator = await handle_chat(data["query"], enable_reasoning=data.get("enable_reasoning", False))
     return StreamingResponse(generator, media_type="text/event-stream")
 

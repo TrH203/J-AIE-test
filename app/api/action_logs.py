@@ -27,5 +27,6 @@ async def get_all_logs(
 async def get_log_by_id(log_id: str):
     """
     Get a single action log by its ID
+    Example: /logs/{log_id}
     """
     return await search_log_by_id(log_id=log_id)
