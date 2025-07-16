@@ -235,12 +235,12 @@ curl -X POST http://0.0.0.0:8000/chat \
 
 # Get all action logs
 ```bash
-curl -X GET http://localhost:8000/logs/
+curl -X GET http://0.0.0.0:8000/logs/
 ```
 
 # Get all audit logs
 ```bash
-curl -X GET http://localhost:8000/audit/
+curl -X GET http://0.0.0.0:8000/audit/
 ```
 
 ### Environment Variables (.env.deploy)
