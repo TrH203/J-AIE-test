@@ -44,7 +44,7 @@ curl -X POST http://0.0.0.0:8000/chat \
     -d '{"query": "What is the name of singer and rapper in Viet Nam", "enable_reasoning": true}'
 
 #Get all action logs
-curl -X GET http://localhost:8000/logs/
+curl -X GET http://0.0.0.0:8000/logs/
 
 #Get all audit logs
-curl -X GET http://localhost:8000/audit/
+curl -X GET http://0.0.0.0:8000/audit/
